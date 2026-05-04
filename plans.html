@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>دکان AI بوٹ — پلانز خریدیں</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1E6D">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1E6D;--navy2:#162e8a;
+  --green:#1DA851;--wa:#25D366;
+  --gold:#F5A623;--red:#E53935;
+  --bg:#EEF2FF;--white:#fff;
+  --shadow:0 6px 28px rgba(11,30,109,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Nastaliq Urdu',serif;background:var(--bg);min-height:100vh;direction:rtl;padding-bottom:30px}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;text-align:center;padding:22px 20px 18px;position:relative;overflow:hidden}
+.hdr::before,.hdr::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.04)}
+.hdr::before{width:180px;height:180px;top:-50px;left:-40px}
+.hdr::after{width:220px;height:220px;bottom:-70px;right:-50px}
+.hdr-logo{font-family:'Poppins',sans-serif;font-size:26px;font-weight:900;position:relative}
+.hdr-logo span{color:var(--gold)}
+.hdr-sub{font-size:12px;opacity:.8;margin:4px 0 12px;position:relative}
+.hdr-badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;position:relative}
+.badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:3px 11px;font-size:10px;display:flex;align-items:center;gap:4px}
+
+/* ── MODE TABS ── */
+.mode-tabs{display:flex;background:#fff;border-bottom:2px solid #e8edff;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tab{flex:1;padding:11px 6px;text-align:center;font-size:12px;font-weight:700;color:#888;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;font-family:'Poppins',sans-serif}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy);background:#f5f8ff}
+
+/* ── SECTION TITLE ── */
+.sec-title{background:var(--navy);color:#fff;text-align:center;padding:11px 16px;font-size:15px;font-weight:700;margin:0}
+
+/* ── PLANS ── */
+.plans{padding:14px 12px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto}
+
+.pcard{background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;border:2.5px solid transparent;position:relative}
+.pcard:active{transform:scale(.98)}
+.pcard.sel{border-color:var(--green);box-shadow:0 0 0 4px rgba(29,168,81,.14),var(--shadow)}
+.pcard.sel::after{content:'✓';position:absolute;top:9px;left:11px;width:24px;height:24px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:'Poppins',sans-serif;font-weight:900}
+
+.ph{display:flex;align-items:center;gap:11px;padding:13px 15px 9px}
+.picon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.pinfo{flex:1}
+.pname{font-size:14px;font-weight:700;color:var(--navy);line-height:1.3}
+.pdur{font-size:10px;color:#888;margin-top:2px}
+.pprice{font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:var(--navy);line-height:1;text-align:left}
+.pprice small{font-size:10px;font-weight:600;color:#999;display:block;text-align:center}
+
+.pdetail{padding:7px 15px 13px;font-size:11px;color:#666;border-top:1px solid #f2f2f2;line-height:1.9}
+
+.hot-tag{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-family:'Poppins',sans-serif;font-size:8px;font-weight:800;padding:3px 9px;border-radius:0 14px 0 9px;letter-spacing:.5px}
+
+.p-free .picon{background:#e8f5e9}.p-free .pprice{color:var(--green)}.p-free{border-color:#c8e6c9}
+.p-monthly .picon{background:#e3f2fd}
+.p-mah .picon{background:#fff3e0}
+.p-salana .picon{background:#fce4ec}
+.p-lifetime .picon{background:#fff8e1}.p-lifetime{background:linear-gradient(135deg,#fffde7 0%,#fff 60%)}.p-lifetime .pname{color:#b8860b}.p-lifetime .pprice{color:#b8860b}
+.p-custom .picon{background:#f3e5f5}.p-custom .pprice{font-size:13px;color:#7b1fa2}
+
+/* ── PAYMENT PANEL ── */
+.pay-panel{max-width:480px;margin:0 auto;padding:0 12px;display:none;animation:slideUp .28s ease}
+.pay-panel.show{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.sel-bar{background:var(--navy);color:#fff;border-radius:12px 12px 0 0;padding:11px 15px;display:flex;align-items:center;justify-content:space-between}
+.sel-bar-name{font-size:13px;opacity:.8}
+.sel-bar-price{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--gold)}
+
+.pay-box{background:#fff;border-radius:0 0 16px 16px;box-shadow:var(--shadow);padding:16px}
+
+.pay-mtitle{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;text-align:center}
+
+.pay-methods{display:flex;gap:9px;margin-bottom:13px}
+.pm{flex:1;border:2px solid #e0e0e0;border-radius:12px;padding:11px 6px;text-align:center;cursor:pointer;transition:all .15s}
+.pm.active{border-color:var(--navy);background:#f0f4ff}
+.pm-logo{font-size:26px;margin-bottom:5px}
+.pm-num{font-family:'Poppins',sans-serif;font-size:12px;font-weight:800;color:var(--navy);direction:ltr}
+.pm-owner{font-size:9px;color:#888;margin-top:2px}
+
+.steps-box{background:#f8f9ff;border:1px solid #dde3ff;border-radius:10px;padding:12px;margin-bottom:12px}
+.step-r{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.step-r:last-child{margin-bottom:0}
+.snum{width:21px;height:21px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:10px;font-weight:800;flex-shrink:0;margin-top:2px}
+.stxt{font-size:11px;color:#444;line-height:1.9}
+.stxt b{color:var(--navy)}
+
+.inp-grp{margin-bottom:11px}
+.inp-grp label{display:block;font-size:11px;font-weight:700;color:#555;margin-bottom:4px}
+.inp-grp input{width:100%;padding:10px 13px;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;font-family:'Poppins',sans-serif;direction:ltr;text-align:left;outline:none;transition:border-color .15s}
+.inp-grp input:focus{border-color:var(--navy)}
+
+.btn-wa{width:100%;background:var(--wa);color:#fff;border:none;border-radius:14px;padding:15px;font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 18px rgba(37,211,102,.3);transition:transform .15s}
+.btn-wa:active{transform:scale(.97)}
+.btn-wa-note{text-align:center;font-size:10px;color:#888;margin-top:7px;line-height:1.7}
+
+/* ── FREE TRIAL SPECIAL ── */
+.free-box{background:linear-gradient(135deg,#e8f5e9,#f1fff4);border:2px solid #a5d6a7;border-radius:14px;padding:16px;text-align:center;margin-bottom:12px}
+.free-box .fi{font-size:36px;margin-bottom:8px}
+.free-box h3{font-size:14px;font-weight:700;color:var(--green);margin-bottom:4px}
+.free-box p{font-size:11px;color:#555;line-height:1.9}
+
+/* ── RENEW TAB CONTENT ── */
+.renew-info{background:#fff3e0;border:2px solid #ffcc80;border-radius:14px;padding:14px;margin:14px 12px 0;max-width:480px;margin-left:auto;margin-right:auto;font-size:12px;color:#555;text-align:center;line-height:1.9}
+.renew-info b{color:#e65100}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:18px;font-size:11px;color:#999;max-width:480px;margin:0 auto}
+.footer a{color:var(--wa);text-decoration:none;font-weight:700}
+
+/* Back btn */
+.back-btn{display:flex;align-items:center;gap:6px;padding:12px 14px 0;max-width:480px;margin:0 auto}
+.back-btn a{font-size:11px;color:var(--navy);text-decoration:none;font-weight:700;font-family:'Poppins',sans-serif;display:flex;align-items:center;gap:5px;opacity:.7}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">دکان <span>AI</span> بوٹ</div>
+  <div class="hdr-sub">آپ کے کاروبار کا سمارٹ ساتھی</div>
+  <div class="hdr-badges">
+    <div class="badge">📅 7 دن مفت آزمائش</div>
+    <div class="badge">✅ 100% محفوظ</div>
+    <div class="badge">⚡ 10 منٹ میں ایکٹیو</div>
+  </div>
+</div>
+
+<!-- BACK LINK -->
+<div class="back-btn">
+  <a href="index.html">← واپس بوٹ پر جائیں</a>
+</div>
+
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <div class="tab active" id="tab-new" onclick="switchTab('new')">🆕 نیا پلان خریدیں</div>
+  <div class="tab" id="tab-renew" onclick="switchTab('renew')">🔄 رینیو کریں</div>
+  <div class="tab" id="tab-free" onclick="switchTab('free')">🆓 فری ٹرائل</div>
+</div>
+
+<!-- ════ TAB: NEW PLAN ════ -->
+<div id="view-new">
+  <div class="sec-title">ہمارے آسان اور مفید پلانز</div>
+  <div class="plans" id="plansGrid">
+
+    <div class="pcard p-monthly" onclick="selectPlan(this,'ماہانہ پلان','500','1 ماہ','monthly')">
+      <div class="ph">
+        <div class="picon">📅</div>
+        <div class="pinfo"><div class="pname">ماہانہ پلان</div><div class="pdur">⏱ 1 ماہ</div></div>
+        <div class="pprice">500<small>روپے</small></div>
+      </div>
+      <div class="pdetail">باقاعدہ استعمال کے لیے بہترین</div>
+    </div>
+
+    <div class="pcard p-mah" onclick="selectPlan(this,'mAh پلان','1200','3 ماہ','mah')">
+      <div class="hot-tag">🔥 مقبول</div>
+      <div class="ph">
+        <div class="picon">⚡</div>
+        <div class="pinfo"><div class="pname">mAh پلان</div><div class="pdur">⏱ 3 ماہ</div></div>
+        <div class="pprice">1200<small>روپے</small></div>
+      </div>
+      <div class="pdetail">3 مشینیں / ڈیوائسز کے لیے</div>
+    </div>
+
+    <div class="pcard p-salana" onclick="selectPlan(this,'سالانہ پلان','3500','1 سال','salana')">
+      <div class="ph">
+        <div class="picon">🎯</div>
+        <div class="pinfo"><div class="pname">سالانہ پلان</div><div class="pdur">⏱ 1 سال</div></div>
+        <div class="pprice">3500<small>روپے</small></div>
+      </div>
+      <div class="pdetail">لمبے عرصے کے لیے بہترین بچت</div>
+    </div>
+
+    <div class="pcard p-lifetime" onclick="selectPlan(this,'لائف ٹائم پلان','7000','زندگی بھر','lifetime')">
+      <div class="hot-tag" style="background:#b8860b">👑 بیسٹ ویلیو</div>
+      <div class="ph">
+        <div class="picon">👑</div>
+        <div class="pinfo"><div class="pname">لائف ٹائم پلان</div><div class="pdur">⏱ زندگی بھر</div></div>
+        <div class="pprice">7000<small>روپے</small></div>
+      </div>
+      <div class="pdetail">ایک بار ادائیگی — زندگی بھر فائدہ ✨</div>
+    </div>
+
+    <div class="pcard p-custom" onclick="selectPlan(this,'کسٹم پلان','حسب ضرورت','آپ سے رابطہ','custom')">
+      <div class="ph">
+        <div class="picon">✏️</div>
+        <div class="pinfo"><div class="pname">کسٹم پلان</div><div class="pdur">⏱ آپ سے رابطہ کریں</div></div>
+        <div class="pprice" style="font-size:12px;color:#7b1fa2">حسب<br>ضرورت</div>
+      </div>
+      <div class="pdetail">اپنی مرضی کا پلان بنوائیں</div>
+    </div>
+
+  </div>
+
+  <!-- PAYMENT PANEL -->
+  <div class="pay-panel" id="payPanel">
+    <div class="sel-bar">
+      <span class="sel-bar-name">منتخب: <b id="selName">—</b></span>
+      <span class="sel-bar-price" id="selPrice">—</span>
+    </div>
+    <div class="pay-box">
+      <div class="pay-mtitle" id="pmTitle">💳 ادائیگی کا طریقہ منتخب کریں</div>
+      <div class="pay-methods" id="pmMethods">
+        <div class="pm active" id="pmEasy" onclick="selMethod('easy')">
+          <div class="pm-logo">💚</div>
+          <div class="pm-num">0343-0605001</div>
+          <div class="pm-owner">Easypaisa — Riaz Hussain</div>
+        </div>
+        <div class="pm" id="pmJazz" onclick="selMethod('jazz')">
+          <div class="pm-logo">🔴</div>
+          <div class="pm-num">0303-4369612</div>
+          <div class="pm-owner">JazzCash — Muhammad Rashid</div>
+        </div>
+      </div>
+      <div class="steps-box" id="stepsBox">
+        <div class="step-r"><div class="snum">1</div><div class="stxt">اوپر نمبر پر <b id="stepAmt">رقم</b> بھیجیں</div></div>
+        <div class="step-r"><div class="snum">2</div><div class="stxt">ادائیگی کا <b>اسکرین شاٹ</b> لیں</div></div>
+        <div class="step-r"><div class="snum">3</div><div class="stxt">نیچے اپنا <b>واٹس ایپ نمبر</b> لکھیں اور بٹن دبائیں</div></div>
+        <div class="step-r"><div class="snum">4</div><div class="stxt">واٹس ایپ کھلے گا — <b>اسکرین شاٹ اٹیچ کریں</b> اور بھیجیں ✅</div></div>
+      </div>
+      <div class="inp-grp">
+        <label>📱 آپ کا واٹس ایپ نمبر *</label>
+        <input type="tel" id="custPhone" placeholder="03xxxxxxxxx" maxlength="11">
+      </div>
+      <div class="inp-grp">
+        <label>👤 آپ کا نام (اختیاری)</label>
+        <input type="text" id="custName" placeholder="مثلاً: احمد علی" style="direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif">
+      </div>
+      <button class="btn-wa" onclick="sendWA('new')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        واٹس ایپ پر بھیجیں 📲
+      </button>
+      <div class="btn-wa-note">واٹس ایپ کھلے گا — اسکرین شاٹ اٹیچ کر کے بھیجیں<br>صرف <b>10 منٹ</b> میں پلان ایکٹیو ⚡</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TAB: RENEW ════ -->
+<div id="view-renew" style="display:none">
+  <div class="sec-title">🔄 لائسنس رینیو کریں</div>
+
+  <div class="renew-info">
+    <b>آپ کی لائسنس expire ہو گئی ہے</b><br>
+    نیچے اپنا پلان منتخب کریں — ادائیگی کریں — واٹس ایپ پر بھیجیں<br>
+    <span style="font-size:10px;color:#888">آپ کا پرانا data محفوظ رہے گا ✅</span>
+  </div>
+
+  <div class="plans">
+
+    <div class="pcard p-monthly" onclick="selectRenewPlan(this,'ماہانہ پلان','500','1 ماہ','monthly')">
+      <div class="ph">
+        <div class="picon">📅</div>
+        <div class="pinfo"><div class="pname">ماہانہ رینیو</div><div class="pdur">⏱ 1 ماہ مزید</div></div>
+        <div class="pprice">500<small>روپے</small></div>
+      </div>
+    </div>
+
+    <div class="pcard p-mah" onclick="selectRenewPlan(this,'mAh پلان','1200','3 ماہ','mah')">
+      <div class="hot-tag">🔥 مقبول</div>
+      <div class="ph">
+        <div class="picon">⚡</div>
+        <div class="pinfo"><div class="pname">mAh رینیو</div><div class="pdur">⏱ 3 ماہ مزید</div></div>
+        <div class="pprice">1200<small>روپے</small></div>
+      </div>
+    </div>
+
+    <div class="pcard p-salana" onclick="selectRenewPlan(this,'سالانہ پلان','3500','1 سال','salana')">
+      <div class="ph">
+        <div class="picon">🎯</div>
+        <div class="pinfo"><div class="pname">سالانہ رینیو</div><div class="pdur">⏱ 1 سال مزید</div></div>
+        <div class="pprice">3500<small>روپے</small></div>
+      </div>
+    </div>
+
+    <div class="pcard p-lifetime" onclick="selectRenewPlan(this,'لائف ٹائم اپگریڈ','7000','زندگی بھر','lifetime')">
+      <div class="hot-tag" style="background:#b8860b">👑 اپگریڈ</div>
+      <div class="ph">
+        <div class="picon">👑</div>
+        <div class="pinfo"><div class="pname">لائف ٹائم اپگریڈ</div><div class="pdur">⏱ ایک بار — ہمیشہ کے لیے</div></div>
+        <div class="pprice">7000<small>روپے</small></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RENEW PAYMENT PANEL -->
+  <div class="pay-panel" id="renewPanel">
+    <div class="sel-bar">
+      <span class="sel-bar-name">رینیو پلان: <b id="rSelName">—</b></span>
+      <span class="sel-bar-price" id="rSelPrice">—</span>
+    </div>
+    <div class="pay-box">
+      <div class="pay-mtitle">💳 ادائیگی کا طریقہ منتخب کریں</div>
+      <div class="pay-methods">
+        <div class="pm active" id="rPmEasy" onclick="selRenewMethod('easy')">
+          <div class="pm-logo">💚</div>
+          <div class="pm-num">0343-0605001</div>
+          <div class="pm-owner">Easypaisa — Riaz Hussain</div>
+        </div>
+        <div class="pm" id="rPmJazz" onclick="selRenewMethod('jazz')">
+          <div class="pm-logo">🔴</div>
+          <div class="pm-num">0303-4369612</div>
+          <div class="pm-owner">JazzCash — Muhammad Rashid</div>
+        </div>
+      </div>
+      <div class="steps-box">
+        <div class="step-r"><div class="snum">1</div><div class="stxt">اوپر نمبر پر <b id="rStepAmt">رقم</b> بھیجیں</div></div>
+        <div class="step-r"><div class="snum">2</div><div class="stxt">اسکرین شاٹ لیں</div></div>
+        <div class="step-r"><div class="snum">3</div><div class="stxt">نیچے اپنا <b>پرانا لائسنس نمبر</b> اور واٹس ایپ نمبر لکھیں</div></div>
+        <div class="step-r"><div class="snum">4</div><div class="stxt">واٹس ایپ پر بھیجیں — آپ کا پلان رینیو ہو جائے گا ✅</div></div>
+      </div>
+      <div class="inp-grp">
+        <label>🔑 آپ کی پرانی License Key (اختیاری)</label>
+        <input type="text" id="rOldKey" placeholder="DKN-XXXX-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:2px;font-weight:700">
+      </div>
+      <div class="inp-grp">
+        <label>📱 آپ کا واٹس ایپ نمبر *</label>
+        <input type="tel" id="rCustPhone" placeholder="03xxxxxxxxx" maxlength="11">
+      </div>
+      <div class="inp-grp">
+        <label>👤 آپ کا نام (اختیاری)</label>
+        <input type="text" id="rCustName" placeholder="مثلاً: احمد علی" style="direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif">
+      </div>
+      <button class="btn-wa" onclick="sendWA('renew')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        رینیو کے لیے واٹس ایپ کریں 🔄
+      </button>
+      <div class="btn-wa-note">آپ کا پرانا data محفوظ رہے گا — صرف key نئی ملے گی ✅</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TAB: FREE TRIAL ════ -->
+<div id="view-free" style="display:none">
+  <div class="sec-title">🆓 مفت 7 دن ٹرائل</div>
+  <div class="plans">
+    <div class="free-box">
+      <div class="fi">🎁</div>
+      <h3>7 دن بالکل مفت!</h3>
+      <p>پوری سروس آزمائیں — کوئی پیسہ نہیں<br>ادائیگی کی ضرورت نہیں ✅<br>صرف واٹس ایپ پر درخواست بھیجیں</p>
+    </div>
+
+    <div class="pay-box" style="border-radius:16px;box-shadow:var(--shadow)">
+      <div class="inp-grp">
+        <label>📱 آپ کا واٹس ایپ نمبر *</label>
+        <input type="tel" id="fCustPhone" placeholder="03xxxxxxxxx" maxlength="11">
+      </div>
+      <div class="inp-grp">
+        <label>🏪 آپ کی دکان کا نام (اختیاری)</label>
+        <input type="text" id="fShopName" placeholder="مثلاً: احمد جنرل اسٹور" style="direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif">
+      </div>
+      <div class="inp-grp">
+        <label>👤 آپ کا نام</label>
+        <input type="text" id="fCustName" placeholder="مثلاً: احمد علی" style="direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif">
+      </div>
+
+      <div class="steps-box">
+        <div class="step-r"><div class="snum">1</div><div class="stxt">نیچے اپنی معلومات لکھیں</div></div>
+        <div class="step-r"><div class="snum">2</div><div class="stxt"><b>واٹس ایپ بھیجیں</b> کا بٹن دبائیں</div></div>
+        <div class="step-r"><div class="snum">3</div><div class="stxt">صرف <b>10 منٹ</b> میں آپ کی <b>Free Trial Key</b> آ جائے گی ⚡</div></div>
+      </div>
+
+      <button class="btn-wa" onclick="sendWA('free')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        مفت ٹرائل کے لیے بھیجیں 🎁
+      </button>
+      <div class="btn-wa-note">بالکل مفت — کوئی credit card نہیں<br>7 دن بعد کوئی charge نہیں ✅</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  کوئی مسئلہ؟ <a href="https://wa.me/923106803572" target="_blank">📲 Madni Digital Skills سے رابطہ کریں</a>
+</div>
+
+<script>
+const WA_NUM = '923106803572';
+let curPlan = null, curMethod = 'easy';
+let curRenewPlan = null, curRenewMethod = 'easy';
+
+const planData = {
+  monthly:  {name:'ماہانہ پلان',  price:'Rs. 500',  amt:'500',  dur:'1 ماہ'},
+  mah:      {name:'mAh پلان',      price:'Rs. 1200', amt:'1200', dur:'3 ماہ'},
+  salana:   {name:'سالانہ پلان',  price:'Rs. 3500', amt:'3500', dur:'1 سال'},
+  lifetime: {name:'لائف ٹائم پلان',price:'Rs. 7000', amt:'7000', dur:'زندگی بھر'},
+  custom:   {name:'کسٹم پلان',    price:'حسب ضرورت',amt:'',    dur:'آپ بتائیں'},
+};
+
+// ── TABS ──
+function switchTab(t){
+  ['new','renew','free'].forEach(id=>{
+    document.getElementById('view-'+id).style.display = id===t?'block':'none';
+    document.getElementById('tab-'+id).classList.toggle('active', id===t);
+  });
+}
+
+// ── PLAN SELECT (New) ──
+function selectPlan(card, name, price, dur, key){
+  document.querySelectorAll('#view-new .pcard').forEach(c=>c.classList.remove('sel'));
+  card.classList.add('sel');
+  curPlan = key;
+  const p = planData[key];
+  document.getElementById('selName').textContent = p.name;
+  document.getElementById('selPrice').textContent = p.price;
+  document.getElementById('stepAmt').textContent = p.amt ? 'Rs. '+p.amt : 'مقررہ رقم';
+  const isCustom = key==='custom';
+  document.getElementById('pmMethods').style.display = isCustom?'none':'flex';
+  document.getElementById('pmTitle').style.display = isCustom?'none':'block';
+  document.getElementById('stepsBox').style.display = isCustom?'none':'block';
+  const panel = document.getElementById('payPanel');
+  panel.classList.add('show');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function selMethod(m){
+  curMethod=m;
+  document.getElementById('pmEasy').classList.toggle('active',m==='easy');
+  document.getElementById('pmJazz').classList.toggle('active',m==='jazz');
+}
+
+// ── PLAN SELECT (Renew) ──
+function selectRenewPlan(card, name, price, dur, key){
+  document.querySelectorAll('#view-renew .pcard').forEach(c=>c.classList.remove('sel'));
+  card.classList.add('sel');
+  curRenewPlan = key;
+  const p = planData[key];
+  document.getElementById('rSelName').textContent = p.name;
+  document.getElementById('rSelPrice').textContent = p.price;
+  document.getElementById('rStepAmt').textContent = 'Rs. '+p.amt;
+  const panel = document.getElementById('renewPanel');
+  panel.classList.add('show');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function selRenewMethod(m){
+  curRenewMethod=m;
+  document.getElementById('rPmEasy').classList.toggle('active',m==='easy');
+  document.getElementById('rPmJazz').classList.toggle('active',m==='jazz');
+}
+
+// ── SEND TO WHATSAPP ──
+function sendWA(type){
+  let msg='', phone='', valid=true;
+
+  if(type==='new'){
+    if(!curPlan){ alert('پہلے کوئی پلان منتخب کریں'); return; }
+    phone = document.getElementById('custPhone').value.trim();
+    const name = document.getElementById('custName').value.trim() || 'Customer';
+    const p = planData[curPlan];
+    if(curPlan!=='custom' && !phone){ alert('براہ کرم اپنا واٹس ایپ نمبر لکھیں'); document.getElementById('custPhone').focus(); return; }
+    const method = curMethod==='easy' ? 'Easypaisa: 0343-0605001 (Riaz Hussain)' : 'JazzCash: 0303-4369612 (Muhammad Rashid)';
+    if(curPlan==='custom'){
+      msg=`Assalam o Alaikum! 🤝\nMera naam *${name}* hai.\nMujhe *Custom Plan* ke baare mein baat karni hai.\nWatsApp: ${phone||'—'}\nPlz contact karein. Shukriya! 🙏`;
+    } else {
+      msg=`Assalam o Alaikum! 🤝\nMera naam *${name}* hai.\nMainey *${p.name}* (${p.price}) ka payment kar diya hai.\n\n💳 Method: ${method}\n📱 WhatsApp: ${phone}\n📦 Plan: ${p.name} — ${p.dur}\n\n✅ Screenshot attach kar raha/rahi hun.\nPlz meri license key send kar dein. Shukriya! 🙏`;
+    }
+  }
+  else if(type==='renew'){
+    if(!curRenewPlan){ alert('پہلے رینیو پلان منتخب کریں'); return; }
+    phone = document.getElementById('rCustPhone').value.trim();
+    if(!phone){ alert('براہ کرم اپنا واٹس ایپ نمبر لکھیں'); document.getElementById('rCustPhone').focus(); return; }
+    const name = document.getElementById('rCustName').value.trim() || 'Customer';
+    const oldKey = document.getElementById('rOldKey').value.trim().toUpperCase() || '(nahi likhi)';
+    const p = planData[curRenewPlan];
+    const method = curRenewMethod==='easy' ? 'Easypaisa: 0343-0605001 (Riaz Hussain)' : 'JazzCash: 0303-4369612 (Muhammad Rashid)';
+    msg=`Assalam o Alaikum! 🔄 *LICENSE RENEW*\nMera naam *${name}* hai.\n\n🔑 Prani Key: ${oldKey}\n📦 Renew Plan: ${p.name} (${p.price})\n💳 Method: ${method}\n📱 WhatsApp: ${phone}\n\n✅ Payment screenshot attach kar raha/rahi hun.\nPlz renew kar dein. Purana data safe rahe. Shukriya! 🙏`;
+  }
+  else if(type==='free'){
+    phone = document.getElementById('fCustPhone').value.trim();
+    if(!phone){ alert('براہ کرم اپنا واٹس ایپ نمبر لکھیں'); document.getElementById('fCustPhone').focus(); return; }
+    const name = document.getElementById('fCustName').value.trim() || 'Customer';
+    const shop = document.getElementById('fShopName').value.trim() || '—';
+    msg=`Assalam o Alaikum! 🎁 *FREE TRIAL*\nMera naam *${name}* hai.\n🏪 Dukaan: ${shop}\n📱 WhatsApp: ${phone}\n\nMujhe *7-Din Free Trial* key chahiye.\nShukriya! 🙏`;
+  }
+
+  const url=`https://wa.me/${WA_NUM}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+
+// ── Auto-detect tab from URL param ──
+const urlP = new URLSearchParams(location.search);
+const initTab = urlP.get('tab');
+if(initTab==='renew') switchTab('renew');
+else if(initTab==='free') switchTab('free');
+</script>
+</body>
+</html>
